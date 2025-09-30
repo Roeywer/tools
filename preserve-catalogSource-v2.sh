@@ -29,12 +29,12 @@ echo "$indexImage"
 version=`echo "$indexImage" | rev | cut -d : -f 1 | rev`
 pushTo="$dest_registry/catalogsource/$operator:$version"
 # rm -rf $from_path/working-dir/
-
+# Step 5: Pull, tag, push, and remove the index image.
 "$engine" pull "$indexImage"
 "$engine" tag "$indexImage" "$pushTo"
 "$engine" push "$pushTo"
 "$engine" rmi "$indexImage" "$pushTo"
-
+# Step 6: Replace the catalogSource image and name.
 catalogSource=`sed -e "/^metadata:/,/^spec:/{s|^  name: .*|  name: $operator|}" -e "/^spec:/,/^status:/{s|^  image: .*|  image: $pushTo|}" "$cs_path"`
 
 echo "$catalogSource" > "$(dirname "$cs_path")/cs-new.yaml"
